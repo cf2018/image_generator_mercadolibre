@@ -3,8 +3,6 @@ import os
 from google import genai
 from google.genai import types
 
-# Configure API
-client = genai.Client(api_key='AIzaSyC6vHEx58zObcGJUKzFU415u5d_FEvd3Mk')
 
 print("Testing Gemini image generation...")
 
