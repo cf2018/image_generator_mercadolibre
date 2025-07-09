@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercadoLibre Instagram Ad Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            padding: 2rem 0;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 30px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .loading {
+            display: none;
+        }
+        .spinner-border {
+            color: #667eea;
+        }
+        .product-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .image-gallery img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .generated-ad {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .download-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .image-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        .image-option {
+            position: relative;
+            cursor: pointer;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .image-option:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        .image-option.selected {
+            border-color: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+        }
+        .image-option img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            display: block;
+        }
+        .image-option .selection-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #28a745;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .image-option.selected .selection-indicator {
+            opacity: 1;
+        }
+        .selection-info {
+            margin: 1rem 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #2ed573, #2ed573);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 1rem;
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+        .step.active .step-number {
+            background: #667eea;
+            color: white;
+        }
+        .step.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="mb-0">
+                            <i class="fab fa-instagram"></i>
+                            MercadoLibre Instagram Ad Generator
+                        </h1>
+                        <p class="mb-0 mt-2">Generate stunning Instagram ads from MercadoLibre products using AI</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Step Indicator -->
+                        <div class="step-indicator">
+                            <div class="step active" id="step1">
+                                <div class="step-number">1</div>
+                                <span>Paste URL</span>
+                            </div>
+                            <div class="step" id="step2">
+                                <div class="step-number">2</div>
+                                <span>Scrape Data</span>
+                            </div>
+                            <div class="step" id="step3">
+                                <div class="step-number">3</div>
+                                <span>Generate Ad</span>
+                            </div>
+                        </div>
+
+                        <!-- URL Input Section -->
+                        <div class="mb-4">
+                            <label for="productUrl" class="form-label">
+                                <i class="fas fa-link"></i>
+                                MercadoLibre Product URL
+                            </label>
+                            <div class="input-group">
+                                <input type="url" class="form-control" id="productUrl" 
+                                       placeholder="https://articulo.mercadolibre.com.ar/..." 
+                                       required>
+                                <button class="btn btn-primary" type="button" id="scrapeBtn">
+                                    <i class="fas fa-search"></i>
+                                    Scrape Product
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i>
+                                Copy and paste a MercadoLibre product URL here
+                            </div>
+                        </div>
+
+                        <!-- Loading Spinner -->
+                        <div class="loading text-center" id="loadingSpinner">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2" id="loadingText">Scraping product data...</p>
+                        </div>
+
+                        <!-- Product Information Display -->
+                        <div id="productInfo" style="display: none;">
+                            <h5><i class="fas fa-box"></i> Product Information</h5>
+                            <div class="product-info">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6 id="productTitle"></h6>
+                                        <p class="text-success fw-bold fs-4" id="productPrice"></p>
+                                        <p id="productDescription" class="text-muted"></p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Image Selection Section -->
+                                <div class="mt-4">
+                                    <h6><i class="fas fa-images"></i> Select Product Images</h6>
+                                    <div class="selection-info">
+                                        <small>
+                                            <i class="fas fa-info-circle"></i>
+                                            Click on one or more images that you want the AI to use as reference for generating the ad. 
+                                            Selected images should have clean white backgrounds and show the product clearly.
+                                        </small>
+                                    </div>
+                                    <div class="image-selector" id="imageSelector"></div>
+                                    <div id="selectionStatus" class="mt-2"></div>
+                                </div>
+                                
+                                <!-- Text Overlay Options -->
+                                <div class="mt-4">
+                                    <h6><i class="fas fa-font"></i> Text Generation Options</h6>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="useTextOverlay" checked>
+                                        <label class="form-check-label" for="useTextOverlay">
+                                            <strong>Use Programmatic Text Overlay (Recommended)</strong>
+                                        </label>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted" id="textOverlayHelp">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span id="overlayHelpText">
+                                                Professional Spanish text will be added programmatically over a clean product image. This ensures perfect text quality and accuracy.
+                                            </span>
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-primary" id="generateAdBtn" disabled>
+                                        <i class="fas fa-magic"></i>
+                                        Generate Instagram Ad
+                                    </button>
+                                    <small class="d-block mt-2 text-muted">Select at least one image to enable ad generation</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generated Ad Display -->
+                        <div id="generatedAd" style="display: none;">
+                            <h5><i class="fas fa-image"></i> Generated Instagram Ad</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <img id="adImage" class="generated-ad" alt="Generated Instagram Ad">
+                                    <div class="download-section">
+                                        <a href="#" class="btn btn-success" id="downloadBtn">
+                                            <i class="fas fa-download"></i>
+                                            Download Ad
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Ad Concept:</h6>
+                                    <div class="alert alert-info">
+                                        <pre id="adConcept"></pre>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted" id="textModeIndicator"></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-3">
+                                <button class="btn btn-outline-primary" onclick="location.reload()">
+                                    <i class="fas fa-redo"></i>
+                                    Generate Another Ad
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Error Display -->
+                        <div class="alert alert-danger" id="errorAlert" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span id="errorMessage"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentProductData = null;
+        let selectedImages = [];
+
+        // Handle text overlay toggle
+        function updateTextOverlayHelp() {
+            const useOverlay = document.getElementById('useTextOverlay').checked;
+            const helpText = document.getElementById('overlayHelpText');
+            
+            if (useOverlay) {
+                helpText.innerHTML = 'Professional Spanish text will be added programmatically over a clean product image. This ensures perfect text quality and accuracy.';
+            } else {
+                helpText.innerHTML = 'The AI will generate all text directly on the image. This may result in text errors or quality issues, but offers more creative flexibility.';
+            }
+        }
+
+        // Initialize text overlay toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const textOverlayToggle = document.getElementById('useTextOverlay');
+            textOverlayToggle.addEventListener('change', updateTextOverlayHelp);
+            updateTextOverlayHelp(); // Set initial help text
+        });
+
+        // Update step indicator
+        function updateStep(stepNumber) {
+            document.querySelectorAll('.step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < stepNumber) {
+                    step.classList.add('completed');
+                } else if (index + 1 === stepNumber) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        // Show loading spinner
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingSpinner').style.display = 'block';
+        }
+
+        // Hide loading spinner
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorAlert').style.display = 'block';
+            hideLoading();
+        }
+
+        // Hide error
+        function hideError() {
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+
+        // Update selection status
+        function updateSelectionStatus() {
+            const statusElement = document.getElementById('selectionStatus');
+            const generateBtn = document.getElementById('generateAdBtn');
+            const helpText = generateBtn.parentElement.querySelector('small');
+            
+            if (selectedImages.length === 0) {
+                statusElement.innerHTML = '<small class="text-muted">No images selected</small>';
+                generateBtn.disabled = true;
+                if (helpText) helpText.style.display = 'block';
+            } else {
+                statusElement.innerHTML = `<small class="text-success">
+                    <i class="fas fa-check-circle"></i>
+                    ${selectedImages.length} image(s) selected for ad generation
+                </small>`;
+                generateBtn.disabled = false;
+                if (helpText) helpText.style.display = 'none';
+            }
+        }
+
+        // Handle image selection
+        function toggleImageSelection(imageUrl, imageElement) {
+            const index = selectedImages.indexOf(imageUrl);
+            
+            if (index === -1) {
+                // Add to selection
+                selectedImages.push(imageUrl);
+                imageElement.classList.add('selected');
+            } else {
+                // Remove from selection
+                selectedImages.splice(index, 1);
+                imageElement.classList.remove('selected');
+            }
+            
+            updateSelectionStatus();
+        }
+
+        // Update step indicator
+        function updateStep(stepNumber) {
+            document.querySelectorAll('.step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < stepNumber) {
+                    step.classList.add('completed');
+                } else if (index + 1 === stepNumber) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        // Show loading spinner
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingSpinner').style.display = 'block';
+        }
+
+        // Hide loading spinner
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorAlert').style.display = 'block';
+            hideLoading();
+        }
+
+        // Hide error
+        function hideError() {
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+
+        // Scrape product data
+        document.getElementById('scrapeBtn').addEventListener('click', async function() {
+            const url = document.getElementById('productUrl').value.trim();
+            
+            if (!url) {
+                showError('Please enter a MercadoLibre URL');
+                return;
+            }
+
+            hideError();
+            showLoading('Scraping product data...');
+            updateStep(2);
+
+            try {
+                console.log('Sending scrape request to:', '/scrape');
+                console.log('Request payload:', { url: url });
+                
+                const response = await fetch('/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Response not OK:', response.status, errorText);
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        showError(errorData.error || `Server error: ${response.status}`);
+                    } catch {
+                        showError(`Server error: ${response.status} - ${errorText}`);
+                    }
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    currentProductData = data.product_data;
+                    displayProductInfo(data.product_data);
+                    hideLoading();
+                } else {
+                    showError(data.error || 'Failed to scrape product data');
+                }
+            } catch (error) {
+                console.error('Fetch error details:', error);
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                
+                let errorMessage = 'Network error occurred while scraping';
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage = 'Cannot connect to the server. Please make sure the server is running.';
+                } else if (error.name === 'SyntaxError') {
+                    errorMessage = 'Server returned invalid response. Please try again.';
+                } else {
+                    errorMessage = `Network error: ${error.message}`;
+                }
+                
+                showError(errorMessage);
+            }
+        });
+
+        // Display product information
+        function displayProductInfo(productData) {
+            document.getElementById('productTitle').textContent = productData.title;
+            document.getElementById('productPrice').textContent = '$' + productData.price;
+            document.getElementById('productDescription').textContent = productData.description;
+            
+            // Reset selected images
+            selectedImages = [];
+            
+            // Display images for selection
+            const imageSelector = document.getElementById('imageSelector');
+            imageSelector.innerHTML = '';
+            
+            if (productData.images && productData.images.length > 0) {
+                productData.images.forEach((imageUrl, index) => {
+                    const imageOption = document.createElement('div');
+                    imageOption.className = 'image-option';
+                    
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.alt = `Product Image ${index + 1}`;
+                    img.onerror = function() {
+                        imageOption.style.display = 'none';
+                    };
+                    
+                    const indicator = document.createElement('div');
+                    indicator.className = 'selection-indicator';
+                    indicator.innerHTML = '<i class="fas fa-check"></i>';
+                    
+                    imageOption.appendChild(img);
+                    imageOption.appendChild(indicator);
+                    
+                    // Add click handler for selection
+                    imageOption.addEventListener('click', function() {
+                        toggleImageSelection(imageUrl, imageOption);
+                    });
+                    
+                    imageSelector.appendChild(imageOption);
+                });
+            } else {
+                imageSelector.innerHTML = '<p class="text-muted">No images found for this product</p>';
+            }
+            
+            updateSelectionStatus();
+            document.getElementById('productInfo').style.display = 'block';
+        }
+
+        // Generate Instagram ad
+        document.getElementById('generateAdBtn').addEventListener('click', async function() {
+            if (!currentProductData) {
+                showError('No product data available');
+                return;
+            }
+
+            if (selectedImages.length === 0) {
+                showError('Please select at least one image before generating the ad');
+                return;
+            }
+
+            hideError();
+            showLoading('Generating Instagram ad with AI...');
+            updateStep(3);
+
+            try {
+                const useTextOverlay = document.getElementById('useTextOverlay').checked;
+                
+                const response = await fetch('/generate-ad', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        product_data: currentProductData,
+                        selected_images: selectedImages,
+                        use_text_overlay: useTextOverlay
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayGeneratedAd(data);
+                    hideLoading();
+                } else {
+                    showError(data.error || 'Failed to generate Instagram ad');
+                }
+            } catch (error) {
+                showError('Network error occurred while generating ad');
+                console.error('Error:', error);
+            }
+        });
+
+        // Display generated ad
+        function displayGeneratedAd(data) {
+            document.getElementById('adImage').src = data.download_url;
+            document.getElementById('adConcept').textContent = data.ad_concept;
+            document.getElementById('downloadBtn').href = data.download_url;
+            
+            // Show text mode indicator
+            const textModeIndicator = document.getElementById('textModeIndicator');
+            if (data.text_overlay_used) {
+                textModeIndicator.innerHTML = '<i class="fas fa-layer-group"></i> Text generated with programmatic overlay';
+            } else {
+                textModeIndicator.innerHTML = '<i class="fas fa-robot"></i> Text generated by AI';
+            }
+            
+            document.getElementById('generatedAd').style.display = 'block';
+            
+            // Scroll to generated ad
+            document.getElementById('generatedAd').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Allow Enter key to trigger scraping
+        document.getElementById('productUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('scrapeBtn').click();
+            }
+        });
+    </script>
+</body>
+</html>
