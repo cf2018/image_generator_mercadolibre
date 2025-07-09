@@ -1,0 +1,41 @@
+# Python virtual environments
+.venv/
+venv/
+
+# Environment variables
+.env
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches
+.cache/
+.cache
+*.cache
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Output folders
+output/
+outputs/
+
+# Uploaded/generated files
+uploads/
+temp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test outputs
+test_output_*.jpg
+
+# VSCode settings
+.vscode/
+
+# Misc
+*.log
